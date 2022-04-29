@@ -1,0 +1,10 @@
+[{
+  "Warename": "Telefon",
+  "Waremenge": 3,
+  "status": 0
+},
+  {
+    "Warename": "Handy",
+    "Waremenge": 4,
+    "status": 1
+  }]
