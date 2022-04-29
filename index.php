@@ -18,10 +18,47 @@ Schreiben aller Waren in die Datei (wird immer komplett neu geschrieben).
 
 
 */
-$todoliste = json_decode(file_get_contents("index.json"));
-echo '<pre>';
-print_r($todoliste);
-echo '</pr>';
+
+$arr = array();
+
+if(file_exists($FILENAME = 'index.json')) {
+    $jsonIn = file_get_contents($FILENAME);
+    $arr = json_decode($jsonIn, true);
+}
+
+if (!empty($_GET)) {    //prüfen ob GET nicht leer ist
+    if ($_GET['action'] == 'delete') {  // prüfen ob Get Action delete übergeben wird
+        array_splice($arr, $_GET['id'], 1); // entsprechendes arry löschen
+    }
+
+
+    if ($_GET['action'] == 'mark'){
+        if ($arr[$_GET['id']]["completed"] == 0) {
+            $arr[$_GET['id']]["completed"] = true;
+            } else {
+            $arr[$_GET['id']]["completed"] = false;
+
+        }
+
+        }
+
+}
+
+
+    if (!empty($_POST)) {
+        $arr[] = array("Name" => $_POST["Name"],
+            "Menge" => $_POST["Menge"],
+            "completed" => false);
+
+    }
+
+
+
+$json = json_encode($arr, JSON_PRETTY_PRINT);
+file_put_contents($FILENAME, $json);
+
+
+
 
 
 /*
@@ -43,47 +80,15 @@ Ab hier erfolgt die HTML-Ausgabe
 </header>
 <main>
     <ul id="todolist">
-        <?php
-        /*
-            Die beiden folgenden Listeneinträge <li></li> sind als Beispiel hier eingefügt.
-            Sie müssen eine Schleife bauen, die alle vorhandenen Waren schreibt.
-            In der Schleife ist dann nur ein Listeneintrag, den anderen können Sie löschen.
-            Bei jedem Listeneintrag ist dann die ID oder der Zähler der Ware anzugeben.
-            Außerdem muss die Menge und der Name der Ware in den <span>-Tags ausgegeben werden.
-            Eine foreach-Schleife wird im Chat erklärt. Weitere Möglichkeiten: for oder while
-        */
 
-        // Schleife Beginn mit Bedingung einfügen
-
-        ?>
-        <li>
-            <a href="index.php?action=mark&id=<?php /* echo $i */ ;?>" class="done" title="Ware als eingekauft markieren"></a>
-            <span>Menge 1</span>
-            <span>Ware 1</span>
-            <a href="index.php?action=delete&id=" class="delete" title="Ware aus Liste löschen">löschen</a>
-        </li>
-        <li>
-            <a href="index.php?action=mark&id=" class="done checked" title="Ware als eingekauft markieren"></a>
-            <span>Menge 2</span>
-            <span>Ware 2</span>
-            <a href="index.php?action=delete&id=" class="delete" title="Ware aus Liste löschen">löschen</a>
-        </li>
-        <?php
-
-$arr = array();
-
-$arr[] = array("Name" => "Bananen", "Menge" => 2, "markiert" => 1);
-$arr[] = array("Name" => "Erdbeeren", "Menge" => 3, "markiert" => 0);
-$arr[] = array("Name" => "Eier", "Menge" => 6, "markiert" => 0);
-$arr[] = array("Name" => "Tomaten", "Menge" => 5, "markiert" => 1);
-
+  <?php
 
 for($i = 0; $i < count($arr) ; $i++) {
 ?>
       <li>
-        <a href="index.php?action=mark&id=<?php echo $i;?>" class="done <?php if($arr[$i]["markiert"] == 1) echo "checked";?>" title="Ware als eingekauft markieren">Markieren</a>
+        <a href="index.php?action=mark&id=<?php echo $i;?>" class="done <?php if($arr[$i]["completed"] == 1) echo "checked";?>" title="Ware als eingekauft markieren"></a>
         <span><?php echo $arr[$i]["Menge"];?> </span>
-        <span><?php echo $arr[$i]["Name"];?> <?php if($arr[$i]["markiert"] == 1) echo "checked";?></span>
+        <span><?php echo $arr[$i]["Name"];?> <?php if($arr[$i]["completed"] == 1) echo "checked";?></span>
         <a href="index.php?action=delete&id=<?php echo $i;?>" class="delete" title="Ware aus Liste löschen">löschen</a>
       </li>
 <?php
@@ -96,12 +101,12 @@ for($i = 0; $i < count($arr) ; $i++) {
     <div class="spacer"></div>
     <form id="add-todo" action="index.php" method="post">
         <input type="number" placeholder="Menge" name="Menge" Min="1" Max="10">
-        <input type="text" placeholder="Text für neue Ware" name="Ware">
+        <input type="text" placeholder="Text für neue Ware" name="Name">
         <input type="submit" value="hinzufügen">
     </form>
 </main>
 <footer>
-    <p>Name, Vorname - Hochschule</p>
+    <p>Braun, Juliette - THB</p>
 </footer>
 </body>
 </html>
